@@ -1,14 +1,12 @@
 package cf.avicia.avomod2.inventoryoverlay.util;
 
 import cf.avicia.avomod2.inventoryoverlay.item.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.JsonObject;
-import com.google.gson.JsonParser;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 
 import java.lang.reflect.Type;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
@@ -38,7 +36,7 @@ public class ItemsDataHandler {
                 final int MAX_RETRIES_PER_PAGE = 10;
 
                 Gson gson = new Gson();
-                Type mapType = new TypeToken<Map<String, Object>>(){}.getType();
+                Type listType = new TypeToken<List<JsonObject>>(){}.getType();
 
                 Map<String, Object> allItemsMap = new HashMap<>();
 
@@ -64,7 +62,7 @@ public class ItemsDataHandler {
                             JsonObject json = JsonParser.parseString(response).getAsJsonObject();
 
                             JsonObject controller = json.getAsJsonObject("controller");
-                            JsonObject results = json.getAsJsonObject("results");
+                            JsonArray results = json.getAsJsonArray("results");
 
                             if (controller == null || results == null) {
                                 throw new RuntimeException("Missing controller/results");
@@ -72,9 +70,12 @@ public class ItemsDataHandler {
 
                             totalPages = controller.get("pages").getAsInt();
 
-                            Map<String, Object> pageItems = gson.fromJson(results, mapType);
+                            List<JsonObject> pageItems = gson.fromJson(results, listType);
                             if (pageItems != null) {
-                                allItemsMap.putAll(pageItems);
+                                for (JsonObject item : pageItems)
+                                {
+                                    allItemsMap.put(item.get("displayName").getAsString(), item);
+                                }
                             }
 
                             int percent = (int) ((currentPage * 100.0) / totalPages);
