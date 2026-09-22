@@ -13,7 +13,7 @@ public class TradeMarketMiddleClickSearch {
     private static boolean executing = false;
 
     public static ActionResult mouseClicked(double mouseX, double mouseY, int button, Slot clickedSlot, ScreenHandler screenHandler) {
-        if (MinecraftClient.getInstance().player == null || MinecraftClient.getInstance().currentScreen == null ||
+        if (!ConfigsHandler.getConfigBoolean("tradeMarketMiddleClickSearch") || MinecraftClient.getInstance().player == null || MinecraftClient.getInstance().currentScreen == null ||
                 !MinecraftClient.getInstance().currentScreen.getTitle().getString().equals("\uDAFF\uDFE8\uE011") ||
                 MinecraftClient.getInstance().getNetworkHandler() == null ||
                 button != 2 || clickedSlot == null) {
